@@ -105,6 +105,98 @@ LONG InterlockedIncrement(
 ```
 
 更多 InterLocked系统函数，可以参考[https://learn.microsoft.com/en-us/windows/win32/sync/synchronization-functions#interlocked-functions](https://learn.microsoft.com/en-us/windows/win32/sync/synchronization-functions#interlocked-functions)
+## 关键段Critical Section
+本例demo代码位于[https://github.com/iherewaitfor/threadssync/tree/main/criticalsectiondemo](https://github.com/iherewaitfor/threadssync/tree/main/criticalsectiondemo)。起AB两个线程对变量s模拟使用临界区。A线程启动后，立即进入休眠2秒，休眠结束后申请进入临界区。B启动后立即申请进入临界区，由于此时无人占用，B能顺利进入临界区。而A线程申请时，由于 B占用，需要等B释放后，才能继续运行。预期结果，B线程先退出，然后A线程退出。
+
+```C++
+#include <stdio.h>
+#include <windows.h>
+
+
+/*
+使用临界区
+*/
+CRITICAL_SECTION cs;
+
+DWORD WINAPI threadFuncA(LPVOID lpParamter)
+{
+	Sleep(2000);
+	printf("**************threadFuncA 等待临界区解锁!\n");
+	// Request ownership of the critical section.
+	EnterCriticalSection(&cs);
+	printf("**************threadFuncA 等待临界区解锁成功,对其加锁!\n");
+	printf("**************threadFuncA 把临界区解锁!\n");
+	// Release ownership of the critical section.
+	LeaveCriticalSection(&cs);
+	return 0;
+}
+
+DWORD WINAPI threadFuncB(LPVOID lpParamter)
+{
+	EnterCriticalSection(&cs);
+	printf("**************threadFuncB 把临界区锁住了!\n");
+	Sleep(5000);
+	printf("**************threadFuncB 把临界区解锁!\n");
+	// Release ownership of the critical section.
+	LeaveCriticalSection(&cs);
+	return 0;
+}
+
+int main()
+{
+	// Initialize the critical section one time only.
+	if (!InitializeCriticalSectionAndSpinCount(&cs, 0x00000400)) {
+		return 0;
+	}
+	HANDLE threadA = CreateThread(NULL, 0, threadFuncA, NULL, 0, NULL);
+	HANDLE threadB = CreateThread(NULL, 0, threadFuncB, NULL, 0, NULL);
+
+	WaitForSingleObject(threadA, INFINITE);
+	CloseHandle(threadA);//CloseHandle只是关闭了系统句柄,该线程还是可以正常的运行
+	CloseHandle(threadB);
+
+	// Release resources used by the critical section object.
+	DeleteCriticalSection(&cs);
+
+	return 0;
+}
+```
+关键段使用核心逻辑:The following example shows how a thread initializes, enters, and releases a critical section. It uses the [InitializeCriticalSectionAndSpinCount](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-initializecriticalsectionandspincount), [EnterCriticalSection](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-entercriticalsection), [LeaveCriticalSection](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-leavecriticalsection), and [DeleteCriticalSection](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-deletecriticalsection) functions.
+```C++
+// Global variable
+CRITICAL_SECTION CriticalSection; 
+
+int main( void )
+{
+    ...
+
+    // Initialize the critical section one time only.
+    if (!InitializeCriticalSectionAndSpinCount(&CriticalSection, 
+        0x00000400) ) 
+        return;
+    ...
+
+    // Release resources used by the critical section object.
+    DeleteCriticalSection(&CriticalSection);
+}
+
+DWORD WINAPI ThreadProc( LPVOID lpParameter )
+{
+    ...
+
+    // Request ownership of the critical section.
+    EnterCriticalSection(&CriticalSection); 
+
+    // Access the shared resource.
+
+    // Release ownership of the critical section.
+    LeaveCriticalSection(&CriticalSection);
+
+    ...
+return 1;
+}
+```
+
 ## 参考
 
 《Windows核心编程》
@@ -113,3 +205,5 @@ LONG InterlockedIncrement(
 [https://blog.csdn.net/lizhenwei0219/article/details/96145663](https://blog.csdn.net/lizhenwei0219/article/details/96145663)
 
 [https://learn.microsoft.com/en-us/windows/win32/sync/using-synchronization](https://learn.microsoft.com/en-us/windows/win32/sync/using-synchronization)
+
+关键段Critical Section[https://learn.microsoft.com/en-us/windows/win32/sync/using-critical-section-objects](https://learn.microsoft.com/en-us/windows/win32/sync/using-critical-section-objects)
