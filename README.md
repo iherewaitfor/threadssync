@@ -1,3 +1,20 @@
+- [Thread Sync 线程同步](#thread-sync-线程同步)
+	- [InterLocked](#interlocked)
+		- [InterlockedAdd](#interlockedadd)
+			- [\[in, out\] Addend](#in-out-addend)
+			- [\[in\] Value](#in-value)
+			- [Return value](#return-value)
+		- [InterlockedIncrement](#interlockedincrement)
+	- [关键段Critical Section](#关键段critical-section)
+	- [事件同步Event](#事件同步event)
+		- [CreateEvent](#createevent)
+			- [\[in, optional\] LPSECURITY\_ATTRIBUTES lpEventAttributes,](#in-optional-lpsecurity_attributes-lpeventattributes)
+			- [\[in\]           BOOL                  bManualReset](#in-----------bool------------------bmanualreset)
+			- [\[in\]           BOOL                  bInitialState](#in-----------bool------------------binitialstate)
+			- [\[in, optional\] LPCSTR                lpName](#in-optional-lpcstr----------------lpname)
+	- [参考](#参考)
+
+
 # Thread Sync 线程同步
 在以下两种基本情况 下，线程之间需要相互通信 
 1. 需要让多个线程同时访问一下共享资源，同时不能破坏资源的完整性
