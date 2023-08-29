@@ -1,12 +1,13 @@
 - [Thread Sync 线程同步](#thread-sync-线程同步)
-	- [InterLocked](#interlocked)
+- [InterLocked](#interlocked)
 		- [InterlockedAdd](#interlockedadd)
 			- [\[in, out\] Addend](#in-out-addend)
 			- [\[in\] Value](#in-value)
 			- [Return value](#return-value)
 		- [InterlockedIncrement](#interlockedincrement)
-	- [关键段Critical Section](#关键段critical-section)
-	- [事件同步Event](#事件同步event)
+- [关键段Critical Section](#关键段critical-section)
+- [条件变量ConditionVariable](#条件变量conditionvariable)
+- [事件同步Event](#事件同步event)
 		- [CreateEvent](#createevent)
 			- [\[in, optional\] LPSECURITY\_ATTRIBUTES lpEventAttributes,](#in-optional-lpsecurity_attributes-lpeventattributes)
 			- [\[in\]           BOOL                  bManualReset](#in-----------bool------------------bmanualreset)
@@ -43,7 +44,7 @@
 |2|8|76|153|268|134|148|11082|
 |4|9|145|361|768|244|307|23785|
 
-## InterLocked
+# InterLocked
 
 本例demo代码位于[https://github.com/iherewaitfor/threadssync/tree/main/interlockeddemo](https://github.com/iherewaitfor/threadssync/tree/main/interlockeddemo)。起两个线程对变量g进行自增操作。线程A和线程B都对变量g增加N。预期的结果应该是2N。使用InterLoceked系统函数进行原子操作能得到预期结果。若不使用原子操作，直接 使用g++，则预期结果不是2N，会得到比2N小的数值。
 
@@ -124,7 +125,8 @@ LONG InterlockedIncrement(
 ```
 
 更多 InterLocked系统函数，可以参考[https://learn.microsoft.com/en-us/windows/win32/sync/synchronization-functions#interlocked-functions](https://learn.microsoft.com/en-us/windows/win32/sync/synchronization-functions#interlocked-functions)
-## 关键段Critical Section
+
+# 关键段Critical Section
 本例demo代码位于[https://github.com/iherewaitfor/threadssync/tree/main/criticalsectiondemo](https://github.com/iherewaitfor/threadssync/tree/main/criticalsectiondemo)。起AB两个线程对变量s模拟使用临界区。A线程启动后，立即进入休眠2秒，休眠结束后申请进入临界区。B启动后立即申请进入临界区，由于此时无人占用，B能顺利进入临界区。而A线程申请时，由于 B占用，需要等B释放后，才能继续运行。预期结果，B线程先退出，然后A线程退出。
 
 ```C++
@@ -215,8 +217,12 @@ DWORD WINAPI ThreadProc( LPVOID lpParameter )
 return 1;
 }
 ```
+# 条件变量ConditionVariable
+条件变量不可跨进程。
 
-## 事件同步Event
+使用可以参考
+[ConditionVariablesDemo/README.md](https://github.com/iherewaitfor/threadssync/blob/main/ConditionVariablesDemo/README.md)
+# 事件同步Event
 本例demo代码位于[https://github.com/iherewaitfor/threadssync/tree/main/eventdemo](https://github.com/iherewaitfor/threadssync/tree/main/eventdemo)。起AB两个线程，模板B线程执行完一些操作后，A线程再执行。。A线程启动后立即通过[WaitForSingleObject](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject)等待事件。B启动后休眠5秒，然后他用[SetEvent](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-setevent)触发事件并退出。A收到事件后，继续运行退出。
 
 ```C++
