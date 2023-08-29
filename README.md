@@ -297,14 +297,17 @@ The name of the event object. The name is limited to MAX_PATH characters. Name c
 用法参考
 [semaphoredemo](https://github.com/iherewaitfor/threadssync/blob/main/semaphoredemo)
 
-用法与Event、Mutex类似。可跨进程
-- 创建
+典型用法：控制线程池中可同时运行的线程数
+
+用法与Event、Mutex类似。可跨进程。
+- 创建/打开 
   - CreateSemaphore(NULL, 1, 1, NULL)
   - 参数2:当前可用的信号的量个数 范围为(0 - 参数3)
   - 参数3:信号量的最大值
   - 比如，上可以使用CreateSemaphore(NULL, 1, 3, NULL)
     - 表示当前有1个资源可用
     - 总共有3个资源
+  - 其他进行打开OpenSemaphore
 - 获取
   - WaitForSingleObject(signalSemaphore, INFINITE)
   - 返回时会使用其减少1
