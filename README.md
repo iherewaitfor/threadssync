@@ -317,6 +317,9 @@ The name of the event object. The name is limited to MAX_PATH characters. Name c
 ## 参考
 
 《Windows核心编程》
+
+[https://learn.microsoft.com/en-us/windows/win32/sync/synchronization](https://learn.microsoft.com/en-us/windows/win32/sync/synchronization)
+
 [https://learn.microsoft.com/en-us/windows/win32/sync/synchronization-functions](https://learn.microsoft.com/en-us/windows/win32/sync/synchronization-functions)
 
 [https://blog.csdn.net/lizhenwei0219/article/details/96145663](https://blog.csdn.net/lizhenwei0219/article/details/96145663)
