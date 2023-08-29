@@ -12,7 +12,8 @@
 			- [\[in\]           BOOL                  bManualReset](#in-----------bool------------------bmanualreset)
 			- [\[in\]           BOOL                  bInitialState](#in-----------bool------------------binitialstate)
 			- [\[in, optional\] LPCSTR                lpName](#in-optional-lpcstr----------------lpname)
-- [互斥量Mutex](#互斥量mutex)
+- [互斥量Mutex（单个资源）](#互斥量mutex单个资源)
+- [信号量Semaphore （多个资源）](#信号量semaphore-多个资源)
 	- [参考](#参考)
 
 
@@ -283,7 +284,7 @@ If this parameter is TRUE, the initial state of the event object is signaled; ot
 
 ####   [in, optional] LPCSTR                lpName
 The name of the event object. The name is limited to MAX_PATH characters. Name comparison is case sensitive.
-# 互斥量Mutex
+# 互斥量Mutex（单个资源）
 
 用法请参考[mutexdemo](https://github.com/iherewaitfor/threadssync/blob/main/mutexdemo)
 用法与Event类似。可跨进程。
@@ -292,6 +293,23 @@ The name of the event object. The name is limited to MAX_PATH characters. Name c
 - 获取(等待)
   - WaitForSingleObject(mutex)
 - 释放ReleaseMutex(mutex)
+# 信号量Semaphore （多个资源）
+用法参考
+[semaphoredemo](https://github.com/iherewaitfor/threadssync/blob/main/semaphoredemo)
+
+用法与Event、Mutex类似。可跨进程
+- 创建
+  - CreateSemaphore(NULL, 1, 1, NULL)
+  - 参数2:当前可用的信号的量个数 范围为(0 - 参数3)
+  - 参数3:信号量的最大值
+  - 比如，上可以使用CreateSemaphore(NULL, 1, 3, NULL)
+    - 表示当前有1个资源可用
+    - 总共有3个资源
+- 获取
+  - WaitForSingleObject(signalSemaphore, INFINITE)
+  - 返回时会使用其减少1
+- 释放
+  - ReleaseSemaphore(signalSemaphore, 1, NULL);
 
 ## 参考
 
