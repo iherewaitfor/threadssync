@@ -12,6 +12,7 @@
 			- [\[in\]           BOOL                  bManualReset](#in-----------bool------------------bmanualreset)
 			- [\[in\]           BOOL                  bInitialState](#in-----------bool------------------binitialstate)
 			- [\[in, optional\] LPCSTR                lpName](#in-optional-lpcstr----------------lpname)
+- [互斥量Mutex](#互斥量mutex)
 	- [参考](#参考)
 
 
@@ -282,6 +283,15 @@ If this parameter is TRUE, the initial state of the event object is signaled; ot
 
 ####   [in, optional] LPCSTR                lpName
 The name of the event object. The name is limited to MAX_PATH characters. Name comparison is case sensitive.
+# 互斥量Mutex
+
+用法请参考[mutexdemo](https://github.com/iherewaitfor/threadssync/blob/main/mutexdemo)
+用法与Event类似。可跨进程。
+- 创建Mutex
+  - CreateMutex
+- 获取(等待)
+  - WaitForSingleObject(mutex)
+- 释放ReleaseMutex(mutex)
 
 ## 参考
 
