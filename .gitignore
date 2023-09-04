@@ -4,3 +4,5 @@
 /semaphoredemo/build
 /mutexdemo/build
 /interlockeddemo/build
+/condition_variable/build
+/ConditionVariablesDemo/build
