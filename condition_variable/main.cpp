@@ -27,9 +27,11 @@ void consumer() {
         }
         carCount--; //消费汽车
         std::cout << "consumer: " << std::this_thread::get_id() << " carCount:" << carCount << '\n';
+        lck.unlock(); //可先释放锁，否则被唤醒的线程因抢不锁又被被锁住了。
         if (needNotify) {
             CAR_NOT_MAX.notify_one();
         }
+        //若不显式调用unlock方法，unique_lock离开作用域自动解锁
     }
 }
 
@@ -46,9 +48,11 @@ void producer() {
         }
         carCount++;//生产汽车
         std::cout << "producer: " << std::this_thread::get_id() << " carCount:" << carCount << '\n';
+        lck.unlock(); //可先释放锁，否则被唤醒的线程因抢不锁又被被锁住了。
         if (needNotify) {
             CAR_NOT_ZERO.notify_one();
         }
+        //若不显式调用unlock方法，unique_lock离开作用域自动解锁
     }
 }
 
