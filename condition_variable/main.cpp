@@ -3,7 +3,6 @@
 #include <thread>             // std::thread
 #include <mutex>              // std::mutex, std::unique_lock
 #include <condition_variable> // std::condition_variable
-#include<Windows.h>
 #include <vector>
 
 std::mutex mtx;
@@ -17,7 +16,7 @@ volatile bool g_stop = false;
 
 void consumer() {
     while (!g_stop) {
-        Sleep(1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         if (g_stop) {
             break;
         }
@@ -47,7 +46,7 @@ void consumer() {
 
 void producer() {
     while (!g_stop) {
-        Sleep(200);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         if (g_stop) {//醒来后先看看是不是要退出了。
             break;
         }
