@@ -19,7 +19,7 @@ void consumer() {
         Sleep(1000);
         std::unique_lock<std::mutex> lck(mtx);
         while (carCount == 0) {
-            CAR_NOT_ZERO.wait(lck);//等待条件：汽车数据非0，才进行消费
+            CAR_NOT_ZERO.wait(lck);//等待条件：汽车数据非0，才进行消费。wait阻塞时，释放lock。返回时取得lock
         }
         bool needNotify = false;
         if (carCount == MAX_BUFFER_SIZE) {
