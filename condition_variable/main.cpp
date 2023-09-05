@@ -20,9 +20,14 @@ void consumer() {
         std::unique_lock<std::mutex> lck(mtx);
         while (carCount == 0) {
             CAR_NOT_ZERO.wait(lck);//等待条件：汽车数据非0，才进行消费。wait阻塞时，释放lock。返回时取得lock
+            if (g_stop) {
+                lck.unlock();
+                std::cout << "consumer: " << std::this_thread::get_id() << "  exit" << '\n';
+                return;
+            }
         }
         bool needNotify = false;
-        if (carCount == MAX_BUFFER_SIZE) {
+        if (carCount == 1) {
             needNotify = true; //决定是否要通知生产者生产汽车。
         }
         carCount--; //消费汽车
@@ -33,6 +38,7 @@ void consumer() {
         }
         //若不显式调用unlock方法，unique_lock离开作用域自动解锁
     }
+    std::cout << "consumer: " << std::this_thread::get_id() << "  exit" << '\n';
 }
 
 void producer() {
@@ -41,10 +47,15 @@ void producer() {
         std::unique_lock<std::mutex> lck(mtx);
         while (carCount == MAX_BUFFER_SIZE) {
             CAR_NOT_MAX.wait(lck);
+            if (g_stop) {
+                lck.unlock();
+                std::cout << "producer: " << std::this_thread::get_id() << "  exit" << '\n';
+                return;
+            }
         }
         bool needNotify = false;
         if (carCount == 0) {
-            needNotify = true; //决定是否要通知生产者生产汽车。
+            needNotify = true; //决定是否要通知消费者消费汽车。原来没有，现在有了。
         }
         carCount++;//生产汽车
         std::cout << "producer: " << std::this_thread::get_id() << " carCount:" << carCount << '\n';
@@ -54,6 +65,7 @@ void producer() {
         }
         //若不显式调用unlock方法，unique_lock离开作用域自动解锁
     }
+    std::cout << "producer: " << std::this_thread::get_id() << "  exit" << '\n';
 }
 
 int main()
@@ -63,20 +75,18 @@ int main()
 
     for (int i = 0; i < sizeof(consumers)/sizeof(std::thread); ++i) {
         consumers[i] = std::thread(consumer);
-    }
-    for (int i = 0; i < _countof(consumers); ++i) {
         consumers[i].detach();
     }
 
     for (int i = 0; i < _countof(producers); ++i) {
         producers[i] = std::thread(producer);
-    }
-    for (int i = 0; i < _countof(producers); ++i) {
         producers[i].detach();
     }
     std::cout << "press any key and enter to stop" << std::endl;
     char c = getchar();
     g_stop = true;
+    CAR_NOT_MAX.notify_all(); //叫醒所有等待该条件的线程，退出。
+    CAR_NOT_ZERO.notify_all();//叫醒所有等待该条件的线程，退出。
     //waitfor the  worker threads exit
     std::cout << "press any key and enter to exit" << std::endl;
     std::cin>>c;
