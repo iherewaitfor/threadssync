@@ -16,6 +16,8 @@
   - std::condition_variable
   - 可以消费啦（通知消费者）
     - std::condition_variable CAR_NOT_ZERO
+    - 产品数量非空
   - 可以生产啦（通知生产者）
     - std::condition_variable CAR_NOT_MAX
+    - 产品数量比限定的最大值小
   
